@@ -107,6 +107,71 @@ document.addEventListener('DOMContentLoaded', function() {
         // Sort providers alphabetically
         const sortedProviders = Array.from(providers).sort();
         
+        // Create container for buttons
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.className = 'provider-buttons';
+        
+        // Create "Select Big 3" button
+        const selectBig3Btn = document.createElement('button');
+        selectBig3Btn.className = 'btn provider-btn';
+        selectBig3Btn.textContent = 'Select Big 3';
+        selectBig3Btn.addEventListener('click', function() {
+            // Uncheck all first
+            document.querySelectorAll('#provider-checkboxes input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            
+            // Check only the Big 3
+            const big3 = ['Pragmatic Play', 'Nolimit City', 'Hacksaw Gaming'];
+            big3.forEach(provider => {
+                const id = `provider-${provider.replace(/\s+/g, '-').toLowerCase()}`;
+                const checkbox = document.getElementById(id);
+                if (checkbox) checkbox.checked = true;
+            });
+            
+            sounds.buttonClick.play();
+        });
+        
+        // Create "Clear All" button
+        const clearAllBtn = document.createElement('button');
+        clearAllBtn.className = 'btn provider-btn';
+        clearAllBtn.textContent = 'Clear All';
+        clearAllBtn.addEventListener('click', function() {
+            document.querySelectorAll('#provider-checkboxes input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            sounds.buttonClick.play();
+        });
+        
+        // Add buttons to container
+        buttonsContainer.appendChild(selectBig3Btn);
+        buttonsContainer.appendChild(clearAllBtn);
+        
+        // Add buttons container to checkboxes
+        providerCheckboxes.appendChild(buttonsContainer);
+        
+        // Add styles for provider buttons if needed
+        if (!document.querySelector('.provider-buttons-style')) {
+            const btnStyle = document.createElement('style');
+            btnStyle.className = 'provider-buttons-style';
+            btnStyle.textContent = `
+                .provider-buttons {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 15px;
+                    gap: 10px;
+                }
+                
+                .provider-btn {
+                    padding: 5px 10px;
+                    font-size: 0.8rem;
+                    flex: 1;
+                }
+            `;
+            document.head.appendChild(btnStyle);
+        }
+        
+        // Add checkboxes
         sortedProviders.forEach(provider => {
             const checkboxItem = document.createElement('div');
             checkboxItem.className = 'checkbox-item';
@@ -274,6 +339,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Play slot select sound
         sounds.slotSelect.play();
+        
+        // Generate a random buy amount rounded to the nearest 10
+        const minBuy = gameState.minBuy;
+        const maxBuy = Math.min(gameState.maxBuy, gameState.currentGold);
+        const range = maxBuy - minBuy;
+        
+        // Generate random amount and round to nearest 10
+        let randomBuy = minBuy + (Math.random() * range);
+        randomBuy = Math.round(randomBuy / 10) * 10; // Round to nearest 10
+        
+        // Make sure it's within bounds after rounding
+        randomBuy = Math.max(minBuy, Math.min(maxBuy, randomBuy));
+        
+        // Set the buy amount input
+        buyAmountInput.value = randomBuy;
         
         // Add card flip animation
         slotImageElement.style.transform = 'rotateY(90deg)';
@@ -935,82 +1015,79 @@ document.addEventListener('DOMContentLoaded', function() {
                 bestSlotElement.textContent = gameState.bestSlot.name;
                 bestProfitElement.textContent = gameState.bestSlot.profit.toFixed(2);
                 
-                // Add trophy icon and glow effect to best slot
-                const bestResult = document.querySelector('.top-result:first-child');
-                bestResult.classList.add('best-result');
-                
-                // Add CSS for best result
-                if (!document.querySelector('.best-result-style')) {
-                    const bestResultStyle = document.createElement('style');
-                    bestResultStyle.className = 'best-result-style';
-                    bestResultStyle.textContent = `
-                        .best-result {
-                            position: relative;
-                            animation: bestPulse 2s infinite alternate;
-                        }
-                        
-                        .best-result::before {
-                            content: '🏆';
-                            position: absolute;
-                            left: -30px;
-                            top: 50%;
-                            transform: translateY(-50%);
-                            font-size: 1.5rem;
-                            animation: trophyBounce 1s infinite alternate;
-                        }
-                        
-                        @keyframes bestPulse {
-                            from { box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
-                            to { box-shadow: 0 0 15px rgba(255, 215, 0, 0.8); }
-                        }
-                        
-                        @keyframes trophyBounce {
-                            from { transform: translateY(-50%) scale(1); }
-                            to { transform: translateY(-50%) scale(1.2); }
-                        }
-                    `;
-                    document.head.appendChild(bestResultStyle);
-                }
+                // Add trophy icon and glow effect to best slot after a small delay
+                setTimeout(() => {
+                    const bestResult = document.querySelector('.top-result:first-child');
+                    if (bestResult) bestResult.classList.add('best-result');
+                    
+                    // Add CSS for best result
+                    if (!document.querySelector('.best-result-style')) {
+                        const bestResultStyle = document.createElement('style');
+                        bestResultStyle.className = 'best-result-style';
+                        bestResultStyle.textContent = `
+                            .best-result {
+                                position: relative;
+                                animation: bestPulse 2s infinite alternate;
+                            }
+                            
+                            .best-result::before {
+                                content: '🏆';
+                                position: absolute;
+                                left: -30px;
+                                top: 50%;
+                                transform: translateY(-50%);
+                                font-size: 1.5rem;
+                                animation: trophyBounce 1s infinite alternate;
+                            }
+                            
+                            @keyframes bestPulse {
+                                from { box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+                                to { box-shadow: 0 0 15px rgba(255, 215, 0, 0.8); }
+                            }
+                            
+                            @keyframes trophyBounce {
+                                from { transform: translateY(-50%) scale(1); }
+                                to { transform: translateY(-50%) scale(1.2); }
+                            }
+                        `;
+                        document.head.appendChild(bestResultStyle);
+                    }
+                }, 100);
             }
             
             if (gameState.worstSlot.name !== 'None') {
                 worstSlotElement.textContent = gameState.worstSlot.name;
                 worstLossElement.textContent = Math.abs(gameState.worstSlot.loss).toFixed(2);
                 
-                // Add skull icon to worst slot
-                const worstResult = document.querySelector('.top-result:last-child');
-                worstResult.classList.add('worst-result');
-                
-                // Add CSS for worst result
-                if (!document.querySelector('.worst-result-style')) {
-                    const worstResultStyle = document.createElement('style');
-                    worstResultStyle.className = 'worst-result-style';
-                    worstResultStyle.textContent = `
-                        .worst-result {
-                            position: relative;
-                        }
-                        
-                        .worst-result::before {
-                            content: '☠️';
-                            position: absolute;
-                            left: -30px;
-                            top: 50%;
-                            transform: translateY(-50%);
-                            font-size: 1.5rem;
-                        }
-                    `;
-                    document.head.appendChild(worstResultStyle);
-                }
+                // Add skull icon to worst slot after a small delay
+                setTimeout(() => {
+                    const worstResult = document.querySelector('.top-result:last-child');
+                    if (worstResult) worstResult.classList.add('worst-result');
+                    
+                    // Add CSS for worst result
+                    if (!document.querySelector('.worst-result-style')) {
+                        const worstResultStyle = document.createElement('style');
+                        worstResultStyle.className = 'worst-result-style';
+                        worstResultStyle.textContent = `
+                            .worst-result {
+                                position: relative;
+                            }
+                            
+                            .worst-result::before {
+                                content: '☠️';
+                                position: absolute;
+                                left: -30px;
+                                top: 50%;
+                                transform: translateY(-50%);
+                                font-size: 1.5rem;
+                            }
+                        `;
+                        document.head.appendChild(worstResultStyle);
+                    }
+                }, 100);
             }
             
-            // Create confetti for profit, or stormy clouds for loss
-            if (totalProfitLoss >= 0) {
-                createResultsConfetti();
-            } else {
-                createStormyBackground();
-            }
-            
-            // Show results screen with entrance animation
+            // Show results screen BEFORE creating effects
             gameScreen.classList.remove('active');
             gameScreen.style.animation = '';
             resultsScreen.classList.add('active');
@@ -1028,6 +1105,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
                 document.head.appendChild(resultsEntranceStyle);
             }
+            
+            // Create confetti for profit, or stormy clouds for loss AFTER screen is shown
+            setTimeout(() => {
+                if (totalProfitLoss >= 0) {
+                    createResultsConfetti();
+                } else {
+                    createStormyBackground();
+                }
+            }, 500);
+            
         }, 1000); // Wait for the fade out
     }
     

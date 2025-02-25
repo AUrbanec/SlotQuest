@@ -2,9 +2,22 @@
 
 SlotQuest is a dungeon crawling game that recommends online slots for players based on the games available in the Stake.json file. It's a fun way to track your slot game plays and visualize your journey through different games.
 
-## How to Play
+## Running the Game
 
-1. Open `index.html` in your web browser.
+### Local Setup
+1. Download or clone this repository
+2. Open `index.html` in your web browser
+
+### GitHub Codespaces
+1. Push the code to a GitHub repository
+2. Open the repository on GitHub
+3. Click the "Code" button and select "Open with Codespaces"
+4. Once the Codespace is ready, you have two options:
+   - Run `node server.js` in the terminal and click the "Open in Browser" button
+   - OR run `npx http-server` (this will install http-server if not already present)
+
+## How to Play
+1. Load the game in your browser
 2. On the title screen, set your parameters:
    - **Total Play Amount**: How much money you're starting with
    - **Min/Max Buy Amount**: The range of bet sizes you want to play
@@ -28,7 +41,10 @@ SlotQuest is a dungeon crawling game that recommends online slots for players ba
 ## Game Features
 
 - Track your slot game sessions in a fun dungeon crawler format
-- Filter games by provider
+- Filter games by provider with quick options:
+  - "Select Big 3" button to quickly select Pragmatic Play, Nolimit City, and Hacksaw Gaming
+  - "Clear All" button to deselect all providers
+- Random buy amounts for each slot (rounded to nearest 10)
 - Visual "health bar" that represents your current balance
 - Summary of your best and worst performing slots
 - Responsive design that works on desktop and mobile
