@@ -104,10 +104,25 @@ document.addEventListener('DOMContentLoaded', function() {
     function populateProviderCheckboxes() {
         providerCheckboxes.innerHTML = '';
         
-        // Sort providers alphabetically
-        const sortedProviders = Array.from(providers).sort();
+        // Define priority providers in specific order
+        const priorityProviders = [
+            'Pragmatic Play', 
+            'Hacksaw Gaming', 
+            'Nolimit City', 
+            'Push Gaming', 
+            'Relax Gaming', 
+            '3 Oaks Gaming', 
+            'ELK Studios', 
+            'Slotmill'
+        ];
         
-        // Create container for buttons
+        // Get all providers and sort the remaining ones alphabetically
+        const allProviders = Array.from(providers);
+        const remainingProviders = allProviders
+            .filter(provider => !priorityProviders.includes(provider))
+            .sort();
+        
+        // Create the buttons container at the top
         const buttonsContainer = document.createElement('div');
         buttonsContainer.className = 'provider-buttons';
         
@@ -150,11 +165,80 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add buttons container to checkboxes
         providerCheckboxes.appendChild(buttonsContainer);
         
-        // Add styles for provider buttons if needed
-        if (!document.querySelector('.provider-buttons-style')) {
-            const btnStyle = document.createElement('style');
-            btnStyle.className = 'provider-buttons-style';
-            btnStyle.textContent = `
+        // Create containers for priority and remaining providers
+        const providersContainer = document.createElement('div');
+        providersContainer.className = 'providers-container';
+        
+        // Create section for priority providers
+        const priorityContainer = document.createElement('div');
+        priorityContainer.className = 'provider-section priority-providers';
+        
+        // Create section for remaining providers
+        const remainingContainer = document.createElement('div');
+        remainingContainer.className = 'provider-section remaining-providers';
+        
+        // Create section headers
+        const priorityHeader = document.createElement('h4');
+        priorityHeader.textContent = 'Featured Providers';
+        priorityContainer.appendChild(priorityHeader);
+        
+        const remainingHeader = document.createElement('h4');
+        remainingHeader.textContent = 'Other Providers';
+        remainingContainer.appendChild(remainingHeader);
+        
+        // Add priority providers
+        priorityProviders.forEach(provider => {
+            // Skip if provider doesn't exist in our dataset
+            if (!providers.has(provider)) return;
+            
+            const checkboxItem = document.createElement('div');
+            checkboxItem.className = 'checkbox-item';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `provider-${provider.replace(/\s+/g, '-').toLowerCase()}`;
+            checkbox.value = provider;
+            checkbox.checked = false; // Nothing checked by default
+            
+            const label = document.createElement('label');
+            label.htmlFor = checkbox.id;
+            label.textContent = provider;
+            
+            checkboxItem.appendChild(checkbox);
+            checkboxItem.appendChild(label);
+            priorityContainer.appendChild(checkboxItem);
+        });
+        
+        // Add remaining providers
+        remainingProviders.forEach(provider => {
+            const checkboxItem = document.createElement('div');
+            checkboxItem.className = 'checkbox-item';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `provider-${provider.replace(/\s+/g, '-').toLowerCase()}`;
+            checkbox.value = provider;
+            checkbox.checked = false; // Nothing checked by default
+            
+            const label = document.createElement('label');
+            label.htmlFor = checkbox.id;
+            label.textContent = provider;
+            
+            checkboxItem.appendChild(checkbox);
+            checkboxItem.appendChild(label);
+            remainingContainer.appendChild(checkboxItem);
+        });
+        
+        // Add the sections to the container
+        providersContainer.appendChild(priorityContainer);
+        providersContainer.appendChild(remainingContainer);
+        providerCheckboxes.appendChild(providersContainer);
+        
+        // Add styles for provider organization
+        if (!document.querySelector('.provider-styles')) {
+            const providerStyles = document.createElement('style');
+            providerStyles.className = 'provider-styles';
+            providerStyles.textContent = `
                 .provider-buttons {
                     display: flex;
                     justify-content: space-between;
@@ -167,29 +251,70 @@ document.addEventListener('DOMContentLoaded', function() {
                     font-size: 0.8rem;
                     flex: 1;
                 }
+                
+                .providers-container {
+                    display: flex;
+                    gap: 20px;
+                    max-height: 250px;
+                    overflow-y: auto;
+                }
+                
+                .provider-section {
+                    flex: 1;
+                    border: 1px solid rgba(255, 159, 28, 0.4);
+                    border-radius: 8px;
+                    padding: 10px;
+                    background-color: rgba(0, 0, 0, 0.2);
+                }
+                
+                .provider-section h4 {
+                    margin-top: 0;
+                    margin-bottom: 10px;
+                    padding-bottom: 5px;
+                    border-bottom: 1px solid rgba(255, 159, 28, 0.4);
+                    color: #ff9f1c;
+                    text-align: center;
+                }
+                
+                .checkbox-item {
+                    margin-bottom: 8px;
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .checkbox-item input[type="checkbox"] {
+                    margin-right: 8px;
+                    cursor: pointer;
+                    width: 16px;
+                    height: 16px;
+                }
+                
+                .checkbox-item label {
+                    cursor: pointer;
+                    font-size: 0.9rem;
+                }
+                
+                /* Scrollbar styling */
+                .providers-container::-webkit-scrollbar {
+                    width: 8px;
+                }
+                
+                .providers-container::-webkit-scrollbar-track {
+                    background: rgba(0, 0, 0, 0.2);
+                    border-radius: 4px;
+                }
+                
+                .providers-container::-webkit-scrollbar-thumb {
+                    background: rgba(255, 159, 28, 0.6);
+                    border-radius: 4px;
+                }
+                
+                .providers-container::-webkit-scrollbar-thumb:hover {
+                    background: rgba(255, 159, 28, 0.8);
+                }
             `;
-            document.head.appendChild(btnStyle);
+            document.head.appendChild(providerStyles);
         }
-        
-        // Add checkboxes
-        sortedProviders.forEach(provider => {
-            const checkboxItem = document.createElement('div');
-            checkboxItem.className = 'checkbox-item';
-            
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = `provider-${provider.replace(/\s+/g, '-').toLowerCase()}`;
-            checkbox.value = provider;
-            checkbox.checked = true; // All checked by default
-            
-            const label = document.createElement('label');
-            label.htmlFor = checkbox.id;
-            label.textContent = provider;
-            
-            checkboxItem.appendChild(checkbox);
-            checkboxItem.appendChild(label);
-            providerCheckboxes.appendChild(checkboxItem);
-        });
     }
 
     // Start Game
@@ -340,20 +465,127 @@ document.addEventListener('DOMContentLoaded', function() {
         // Play slot select sound
         sounds.slotSelect.play();
         
-        // Generate a random buy amount rounded to the nearest 10
+        // Generate a random buy amount with bell curve distribution
         const minBuy = gameState.minBuy;
         const maxBuy = Math.min(gameState.maxBuy, gameState.currentGold);
-        const range = maxBuy - minBuy;
+        const mean = (minBuy + maxBuy) / 2; // Center of the bell curve
         
-        // Generate random amount and round to nearest 10
-        let randomBuy = minBuy + (Math.random() * range);
-        randomBuy = Math.round(randomBuy / 10) * 10; // Round to nearest 10
+        // Box-Muller transform to generate a normally distributed random number
+        function generateBellCurveRandom() {
+            let u = 0, v = 0;
+            while(u === 0) u = Math.random(); // Converting [0,1) to (0,1)
+            while(v === 0) v = Math.random();
+            const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+            
+            // Convert to a value between 0 and 1, with most values clustering around 0.5
+            const normalized = (z * 0.25) + 0.5;
+            // Map to our range
+            let result = minBuy + (normalized * (maxBuy - minBuy));
+            // If outside range due to normal distribution, clamp to range
+            result = Math.max(minBuy, Math.min(maxBuy, result));
+            // Round to nearest 10
+            return Math.round(result / 10) * 10;
+        }
         
-        // Make sure it's within bounds after rounding
-        randomBuy = Math.max(minBuy, Math.min(maxBuy, randomBuy));
+        // Generate the bell curve random amount
+        const randomBuy = generateBellCurveRandom();
         
-        // Set the buy amount input
-        buyAmountInput.value = randomBuy;
+        // Set up buy amount animation
+        if (!document.querySelector('.buy-amount-animation-style')) {
+            const buyAmountAnimStyle = document.createElement('style');
+            buyAmountAnimStyle.className = 'buy-amount-animation-style';
+            buyAmountAnimStyle.textContent = `
+                @keyframes numberShuffle {
+                    0% { opacity: 0; transform: translateY(-20px); }
+                    10% { opacity: 1; transform: translateY(0); }
+                    90% { opacity: 1; transform: translateY(0); }
+                    100% { opacity: 0; transform: translateY(20px); }
+                }
+                
+                .number-shuffle-container {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 1.5rem;
+                    font-weight: bold;
+                    color: #ff9f1c;
+                    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+                    z-index: 100;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    width: 100%;
+                    overflow: hidden;
+                    height: 2rem;
+                }
+                
+                .number-animation {
+                    position: absolute;
+                    animation: numberShuffle 0.4s forwards;
+                    width: 100%;
+                    text-align: center;
+                }
+            `;
+            document.head.appendChild(buyAmountAnimStyle);
+        }
+        
+        // Create container for the animation if it doesn't already exist
+        let shuffleContainer = document.querySelector('.number-shuffle-container');
+        if (!shuffleContainer) {
+            shuffleContainer = document.createElement('div');
+            shuffleContainer.className = 'number-shuffle-container';
+            const buyAmountContainer = buyAmountInput.parentElement;
+            buyAmountContainer.style.position = 'relative';
+            buyAmountContainer.appendChild(shuffleContainer);
+        }
+        
+        // Clear any existing animations
+        shuffleContainer.innerHTML = '';
+        
+        // Number of intermediate animation steps
+        const steps = 10;
+        const delay = 0.05;  // Delay between steps in seconds
+        
+        // Create random number sequence and animate them
+        for (let i = 0; i < steps; i++) {
+            // For earlier steps, show more random values, gradually converge to the final value
+            let stepValue;
+            const progress = i / steps;
+            
+            if (progress < 0.7) {
+                // More random values at the beginning
+                const randomRange = (maxBuy - minBuy) * (1 - progress);
+                stepValue = Math.round((minBuy + Math.random() * randomRange) / 10) * 10;
+            } else {
+                // Gradually converge to final value
+                const intermediateValue = Math.round(((maxBuy + minBuy) / 2) / 10) * 10;
+                stepValue = Math.round(((randomBuy * progress) + (intermediateValue * (1 - progress))) / 10) * 10;
+            }
+            
+            const numElement = document.createElement('div');
+            numElement.className = 'number-animation';
+            numElement.textContent = `$${stepValue}`;
+            numElement.style.animationDelay = `${i * delay}s`;
+            shuffleContainer.appendChild(numElement);
+        }
+        
+        // Add the final value
+        const finalElement = document.createElement('div');
+        finalElement.className = 'number-animation';
+        finalElement.textContent = `$${randomBuy}`;
+        finalElement.style.animationDelay = `${steps * delay}s`;
+        shuffleContainer.appendChild(finalElement);
+        
+        // Set the actual input value after animation completes
+        setTimeout(() => {
+            buyAmountInput.value = randomBuy;
+            // Remove animation container after animation
+            setTimeout(() => {
+                shuffleContainer.innerHTML = '';
+            }, 500);
+        }, (steps + 1) * delay * 1000 + 300);
         
         // Add card flip animation
         slotImageElement.style.transform = 'rotateY(90deg)';
