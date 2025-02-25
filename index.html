@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlotQuest - A Dungeon Crawling Slot Adventure</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="title-screen" class="screen active">
+            <h1>SlotQuest</h1>
+            <h2>A Dungeon Crawling Slot Adventure</h2>
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="total-amount">Total Play Amount ($):</label>
+                    <input type="number" id="total-amount" min="0" value="1000">
+                </div>
+                <div class="form-group">
+                    <label for="min-buy">Minimum Buy Amount ($):</label>
+                    <input type="number" id="min-buy" min="0" value="20">
+                </div>
+                <div class="form-group">
+                    <label for="max-buy">Maximum Buy Amount ($):</label>
+                    <input type="number" id="max-buy" min="0" value="100">
+                </div>
+                <div class="form-group">
+                    <label for="num-games">Number of Games:</label>
+                    <input type="number" id="num-games" min="1" max="20" value="5">
+                </div>
+                <div class="form-group">
+                    <label>Game Providers:</label>
+                    <div id="provider-checkboxes" class="checkbox-container">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                <button id="start-game-btn" class="btn">Start Quest</button>
+            </div>
+        </div>
+
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="stats">
+                    <div>Room: <span id="current-room">1</span>/<span id="total-rooms">5</span></div>
+                    <div>Gold: $<span id="current-gold">1000</span></div>
+                </div>
+            </div>
+            <div class="game-content">
+                <div class="enemy-container">
+                    <h2 id="slot-name">Slot Monster</h2>
+                    <div class="slot-image-container">
+                        <img id="slot-image" src="" alt="Slot Game">
+                    </div>
+                    <div class="slot-info">
+                        <p>Provider: <span id="slot-provider">Provider</span></p>
+                    </div>
+                </div>
+                <div class="battle-actions">
+                    <div class="form-group">
+                        <label for="buy-amount">Buy Amount ($):</label>
+                        <input type="number" id="buy-amount" min="20" max="100" value="20">
+                    </div>
+                    <button id="play-slot-btn" class="btn action-btn">Play This Slot</button>
+                    <button id="reroll-btn" class="btn action-btn">Re-roll Slot (Different Site?)</button>
+                    <div class="form-group result-group" style="display: none;">
+                        <label for="result-amount">Enter Result Amount ($):</label>
+                        <input type="number" id="result-amount" min="0" value="0">
+                        <button id="submit-result-btn" class="btn">Submit Result</button>
+                    </div>
+                </div>
+            </div>
+            <div class="health-bar-container">
+                <div class="health-bar-label">Session Balance:</div>
+                <div class="health-bar">
+                    <div class="health-fill" id="health-fill"></div>
+                </div>
+                <div class="health-text">$<span id="health-amount">1000</span></div>
+            </div>
+        </div>
+
+        <div id="results-screen" class="screen">
+            <h1>Quest Complete!</h1>
+            <div class="results-container">
+                <div class="result-stat">
+                    <h2>Final Balance: $<span id="final-balance">0</span></h2>
+                    <h3>Total Profit/Loss: $<span id="total-profit-loss">0</span></h3>
+                </div>
+                <div class="result-lists">
+                    <div class="result-column">
+                        <h3>Battles Fought:</h3>
+                        <ul id="battles-list">
+                            <!-- Will be populated by JavaScript -->
+                        </ul>
+                    </div>
+                    <div class="result-column">
+                        <h3>Top Performances:</h3>
+                        <div class="top-result">
+                            <p>Best Slot: <span id="best-slot">None</span></p>
+                            <p>Profit: $<span id="best-profit">0</span></p>
+                        </div>
+                        <div class="top-result">
+                            <p>Worst Slot: <span id="worst-slot">None</span></p>
+                            <p>Loss: $<span id="worst-loss">0</span></p>
+                        </div>
+                    </div>
+                </div>
+                <button id="restart-btn" class="btn">Back to Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="crypto-tips">
+            <p>Tips appreciated:</p>
+            <div class="crypto-addresses">
+                <div class="crypto">
+                    <span>BTC:</span> 
+                    <code>bc1qhkw7x9v09hanwm0w47y9nu27n5ygk22hcr7h54</code>
+                </div>
+                <div class="crypto">
+                    <span>ETH:</span> 
+                    <code>0x2736FFd6B2AB8e89F31Bd7c17feA8e2F698C4Ac7</code>
+                </div>
+                <div class="crypto">
+                    <span>LTC:</span> 
+                    <code>ltc1qvufdhtcj580tjl4azkeqfftzlyfvwnhrvl2hy6</code>
+                </div>
+                <div class="crypto">
+                    <span>SOL:</span> 
+                    <code>9pKnqFzw84e3MUvdqGVw3XrQthxBrgxyNGC9P1VVNHBx</code>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

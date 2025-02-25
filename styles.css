@@ -1,0 +1,618 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1a1a2e;
+    color: #fff;
+    line-height: 1.6;
+    background-image: url('images/dungeon-bg.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+#game-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: calc(100vh - 120px);
+    position: relative;
+    z-index: 1;
+}
+
+.screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: rgba(22, 33, 62, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    border: 2px solid #594a9d;
+    position: relative;
+    overflow: hidden;
+}
+
+.screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('images/parchment-texture.jpg');
+    background-size: cover;
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.screen.active {
+    display: flex;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+    font-size: 3.5rem;
+    text-align: center;
+    margin-bottom: 10px;
+    color: #ff9f1c;
+    text-shadow: 0 0 10px rgba(255, 159, 28, 0.5);
+    font-family: 'Luminari', 'Georgia', serif;
+    letter-spacing: 3px;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 10px rgba(255, 159, 28, 0.5); }
+    to { text-shadow: 0 0 20px rgba(255, 159, 28, 0.8), 0 0 30px rgba(255, 159, 28, 0.6); }
+}
+
+h2 {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #e6e6e6;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 600px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #f8f9fa;
+}
+
+input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #0f3460;
+    background-color: #1a1a2e;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #1a1a2e;
+    border-radius: 5px;
+    border: 2px solid #0f3460;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    margin-bottom: 10px;
+}
+
+.checkbox-item input {
+    margin-right: 5px;
+}
+
+.btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #ff9f1c;
+    color: #16213e;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 0 #cc7a09, 0 5px 5px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: 0.5s;
+}
+
+.btn:hover {
+    background-color: #ffb445;
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #cc7a09, 0 3px 3px rgba(0, 0, 0, 0.3);
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #cc7a09, 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.btn:disabled {
+    background-color: #a67a47;
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #7a5d38, 0 3px 3px rgba(0, 0, 0, 0.3);
+    cursor: not-allowed;
+}
+
+.action-btn {
+    margin-bottom: 15px;
+}
+
+/* Game Screen Styles */
+.game-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.stats {
+    display: flex;
+    gap: 20px;
+    font-size: 1.2rem;
+}
+
+.game-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.enemy-container {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.enemy-container::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 40px;
+    background-image: url('images/monster-banner.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 1;
+}
+
+.slot-image-container {
+    width: 200px;
+    height: 280px;
+    margin: 20px auto 20px;
+    border: 3px solid #843c0c;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(207, 83, 0, 0.6);
+    background-color: #16213e;
+    position: relative;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    transition: transform 0.5s ease-in-out;
+}
+
+.slot-image-container:hover {
+    transform: scale(1.05) rotate(2deg);
+}
+
+.slot-image-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 50%);
+    pointer-events: none;
+}
+
+.slot-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: filter 0.3s ease;
+    animation: pulse 2s infinite alternate;
+}
+
+@keyframes pulse {
+    from { transform: scale(1); box-shadow: 0 0 15px rgba(207, 83, 0, 0.6); }
+    to { transform: scale(1.02); box-shadow: 0 0 25px rgba(207, 83, 0, 0.8); }
+}
+
+.slot-info {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.battle-actions {
+    width: 100%;
+    max-width: 400px;
+}
+
+.health-bar-container {
+    width: 100%;
+    margin-top: 20px;
+    position: relative;
+    padding: 10px;
+    border: 2px solid #594a9d;
+    border-radius: 8px;
+    background-color: rgba(22, 33, 62, 0.7);
+}
+
+.health-bar-container::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    background-image: url('images/gold-coin.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.health-bar-label {
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #ff9f1c;
+    text-shadow: 1px 1px 2px #000;
+    font-size: 1.2rem;
+}
+
+.health-bar {
+    width: 100%;
+    height: 30px;
+    background-color: #333;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 5px;
+    border: 2px solid #000;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.health-fill {
+    height: 100%;
+    background-color: #2ecc71;
+    width: 100%;
+    transition: width 0.8s, background-color 0.5s;
+    background-image: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.2),
+        transparent 50%,
+        rgba(0, 0, 0, 0.2)
+    );
+    position: relative;
+    overflow: hidden;
+}
+
+.health-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 100%
+    );
+    animation: barShine 2s infinite linear;
+    transform: translateX(-100%);
+}
+
+@keyframes barShine {
+    100% { transform: translateX(100%); }
+}
+
+.health-fill.loss {
+    background-color: #e74c3c;
+}
+
+.health-fill.profit {
+    background-color: #2ecc71;
+}
+
+.health-text {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: gold;
+    text-shadow: 1px 1px 2px #000;
+}
+
+/* Results Screen */
+.results-container {
+    width: 100%;
+    position: relative;
+}
+
+.results-container::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 60px;
+    background-image: url('images/victory-banner.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 1;
+}
+
+.result-stat {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: rgba(26, 26, 46, 0.7);
+    border: 2px solid #594a9d;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    animation: glowBorder 2s infinite alternate;
+}
+
+@keyframes glowBorder {
+    from { box-shadow: 0 0 5px rgba(255, 159, 28, 0.5); }
+    to { box-shadow: 0 0 15px rgba(255, 159, 28, 0.8); }
+}
+
+.result-stat h2, .result-stat h3 {
+    margin-bottom: 10px;
+}
+
+.result-lists {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-bottom: 30px;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.result-column {
+    flex: 1;
+    min-width: 250px;
+    position: relative;
+}
+
+.result-column h3 {
+    margin-bottom: 15px;
+    color: #ff9f1c;
+    padding: 5px 10px;
+    background-color: rgba(26, 26, 46, 0.7);
+    border-radius: 4px;
+    display: inline-block;
+    position: relative;
+}
+
+.result-column h3::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #ff9f1c, transparent);
+}
+
+.result-column ul {
+    list-style-type: none;
+    max-height: 300px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #ff9f1c #16213e;
+}
+
+.result-column li {
+    margin-bottom: 10px;
+    padding: 12px;
+    background-color: rgba(26, 26, 46, 0.8);
+    border-radius: 5px;
+    border-left: 3px solid #594a9d;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.result-column li:hover {
+    transform: translateX(5px);
+    border-left-color: #ff9f1c;
+    background-color: rgba(26, 26, 46, 0.9);
+}
+
+.top-result {
+    margin-bottom: 15px;
+    padding: 15px;
+    background-color: rgba(26, 26, 46, 0.8);
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border-left: 3px solid #594a9d;
+}
+
+.top-result:first-child {
+    border-left-color: #ffd700;
+}
+
+.top-result:last-child {
+    border-left-color: #e74c3c;
+}
+
+.top-result:hover {
+    transform: translateX(5px);
+    background-color: rgba(26, 26, 46, 0.9);
+}
+
+.top-result p {
+    margin-bottom: 5px;
+}
+
+/* Result display formatting */
+.win {
+    color: #2ecc71;
+}
+
+.loss {
+    color: #e74c3c;
+}
+
+.result-group {
+    border: 2px solid #0f3460;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #16213e;
+    margin-top: 20px;
+}
+
+.result-group label {
+    margin-bottom: 10px;
+}
+
+.result-group button {
+    margin-top: 15px;
+}
+
+/* Footer Styles */
+footer {
+    background-color: #16213e;
+    padding: 20px;
+    text-align: center;
+    border-top: 2px solid #0f3460;
+    margin-top: 20px;
+}
+
+.crypto-tips {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.crypto-tips p {
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #ff9f1c;
+}
+
+.crypto-addresses {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.crypto {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.crypto span {
+    font-weight: bold;
+    min-width: 50px;
+}
+
+.crypto code {
+    background-color: #1a1a2e;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-family: monospace;
+    word-break: break-all;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.5rem;
+    }
+    
+    h2 {
+        font-size: 1.2rem;
+    }
+    
+    .stats {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .result-lists {
+        flex-direction: column;
+    }
+    
+    .crypto {
+        flex-direction: column;
+        align-items: start;
+    }
+}
