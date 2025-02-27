@@ -4,6 +4,9 @@ SlotQuest is a dungeon crawling game that recommends online slots for players ba
 
 ## Running the Game
 
+### Play Online
+The game is available online at: https://yourusername.github.io/slotquest/
+
 ### Local Setup
 1. Download or clone this repository
 2. Open `index.html` in your web browser
@@ -15,6 +18,15 @@ SlotQuest is a dungeon crawling game that recommends online slots for players ba
 4. Once the Codespace is ready, you have two options:
    - Run `node server.js` in the terminal and click the "Open in Browser" button
    - OR run `npx http-server` (this will install http-server if not already present)
+
+### GitHub Pages Setup
+1. Push the code to a GitHub repository
+2. Go to your repository on GitHub
+3. Click on "Settings"
+4. Scroll down to the "GitHub Pages" section
+5. Under "Source", select "main" branch
+6. Click "Save"
+7. Your site will be available at https://yourusername.github.io/slotquest/
 
 ## How to Play
 1. Load the game in your browser

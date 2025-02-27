@@ -386,6 +386,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Reset result group
             resultGroup.style.display = 'none';
             
+            // Initialize the game world with current level
+            gameWorld.initialize(gameState.currentRoom);
+            
             // Select a random slot
             selectRandomSlot();
             
@@ -903,6 +906,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Update room number
                     gameState.currentRoom++;
                     currentRoomElement.textContent = gameState.currentRoom;
+                    
+                    // Generate a new procedural level for the next room
+                    gameWorld.initialize(gameState.currentRoom);
                     
                     // Show next room number
                     const nextRoomEffect = document.createElement('div');
