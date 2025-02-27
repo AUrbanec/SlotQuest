@@ -5,7 +5,7 @@ SlotQuest is a dungeon crawling game that recommends online slots for players ba
 ## Running the Game
 
 ### Play Online
-The game is available online at: https://yourusername.github.io/slotquest/
+The game is available online at: https://aurbanec.github.io/slotquest/
 
 ### Local Setup
 1. Download or clone this repository
