@@ -682,8 +682,18 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateFeatureSpinsVisibility() {
         // Show/hide feature spins multiplier and options based on whether feature spins is enabled
         const hasFeatureSpins = featureSpinsInput.value === 'true';
-        featureSpinsMultiplierInput.parentElement.style.display = hasFeatureSpins ? 'block' : 'none';
-        featureSpinsOptions.style.display = hasFeatureSpins ? 'block' : 'none';
+        
+        // Make sure we have the DOM elements before trying to modify them
+        if (featureSpinsMultiplierInput && featureSpinsMultiplierInput.parentElement) {
+            featureSpinsMultiplierInput.parentElement.style.display = hasFeatureSpins ? 'block' : 'none';
+        }
+        
+        if (featureSpinsOptions) {
+            featureSpinsOptions.style.display = hasFeatureSpins ? 'block' : 'none';
+            console.log('Feature spins options visibility set to:', hasFeatureSpins ? 'block' : 'none');
+        } else {
+            console.error('Feature spins options element not found');
+        }
     }
     
     function updateFeatureSpinsFromProvider(providerName) {
