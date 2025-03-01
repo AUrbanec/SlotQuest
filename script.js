@@ -460,6 +460,15 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     document.head.appendChild(style);
 
+    // Default provider bet levels
+    const defaultProviderBetLevels = {
+        'Pragmatic Play': [0.20, 0.40, 0.60, 0.80, 1.00, 2.00, 4.00, 6.00, 8.00, 10.00, 20.00, 50.00, 100.00],
+        'Hacksaw Gaming': [0.10, 0.20, 0.50, 1.00, 2.00, 5.00, 10.00, 20.00, 50.00, 100.00],
+        'Nolimit City': [0.20, 0.40, 0.60, 1.00, 1.50, 2.00, 3.00, 5.00, 10.00, 20.00, 50.00, 100.00],
+        'Play\'n Go': [0.10, 0.20, 0.30, 0.50, 1.00, 2.00, 5.00, 10.00, 20.00, 50.00, 100.00],
+        'Relax Gaming': [0.10, 0.20, 0.50, 1.00, 2.00, 4.00, 6.00, 8.00, 10.00, 20.00, 40.00, 60.00, 100.00]
+    };
+
     // Select a random slot
     function selectRandomSlot() {
         const randomIndex = Math.floor(Math.random() * gameState.slots.length);
@@ -468,30 +477,109 @@ document.addEventListener('DOMContentLoaded', function() {
         // Play slot select sound
         sounds.slotSelect.play();
         
-        // Generate a random buy amount with bell curve distribution
-        const minBuy = gameState.minBuy;
-        const maxBuy = Math.min(gameState.maxBuy, gameState.currentGold);
-        const mean = (minBuy + maxBuy) / 2; // Center of the bell curve
-        
-        // Box-Muller transform to generate a normally distributed random number
-        function generateBellCurveRandom() {
-            let u = 0, v = 0;
-            while(u === 0) u = Math.random(); // Converting [0,1) to (0,1)
-            while(v === 0) v = Math.random();
-            const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-            
-            // Convert to a value between 0 and 1, with most values clustering around 0.5
-            const normalized = (z * 0.25) + 0.5;
-            // Map to our range
-            let result = minBuy + (normalized * (maxBuy - minBuy));
-            // If outside range due to normal distribution, clamp to range
-            result = Math.max(minBuy, Math.min(maxBuy, result));
-            // Round to nearest 10
-            return Math.round(result / 10) * 10;
+        // Check if the slot has custom bet levels
+        let betLevels = [];
+        if (gameState.currentSlot.bet_levels && gameState.currentSlot.bet_levels.length > 0) {
+            betLevels = gameState.currentSlot.bet_levels;
+        } else {
+            // No custom bet levels, check if we have default levels for this provider
+            const providerDefaults = defaultProviderBetLevels[gameState.currentSlot.provider];
+            if (providerDefaults && providerDefaults.length > 0) {
+                betLevels = providerDefaults;
+            } else {
+                // No provider defaults either, generate generic levels
+                betLevels = generateGenericBetLevels(gameState.minBuy, gameState.maxBuy);
+            }
         }
         
-        // Generate the bell curve random amount
-        const randomBuy = generateBellCurveRandom();
+        // Filter bet levels based on min/max buy settings and current gold
+        const availableBetLevels = betLevels.filter(level => 
+            level >= gameState.minBuy && 
+            level <= gameState.maxBuy && 
+            level <= gameState.currentGold
+        );
+        
+        let randomBuy;
+        if (availableBetLevels.length > 0) {
+            // Use weighted random from available bet levels
+            // Slightly prefer middle bet levels
+            const weights = availableBetLevels.map((_, index, array) => {
+                const normalizedPos = index / (array.length - 1 || 1); // 0 to 1
+                // Create a bell curve weight centered at 0.5
+                return 1 - Math.abs(normalizedPos - 0.5) * 1.2; // Higher weight for middle values
+            });
+            
+            randomBuy = weightedRandom(availableBetLevels, weights);
+        } else {
+            // No suitable bet levels, generate a random amount (fallback)
+            const minBuy = gameState.minBuy;
+            const maxBuy = Math.min(gameState.maxBuy, gameState.currentGold);
+            
+            // Box-Muller transform to generate a normally distributed random number
+            function generateBellCurveRandom() {
+                let u = 0, v = 0;
+                while(u === 0) u = Math.random(); // Converting [0,1) to (0,1)
+                while(v === 0) v = Math.random();
+                const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+                
+                // Convert to a value between 0 and 1, with most values clustering around 0.5
+                const normalized = (z * 0.25) + 0.5;
+                // Map to our range
+                let result = minBuy + (normalized * (maxBuy - minBuy));
+                // If outside range due to normal distribution, clamp to range
+                result = Math.max(minBuy, Math.min(maxBuy, result));
+                // Round to nearest 10 cents
+                return Math.round(result * 10) / 10;
+            }
+            
+            randomBuy = generateBellCurveRandom();
+        }
+        
+        // Helper function for weighted random selection
+        function weightedRandom(items, weights) {
+            // Calculate the sum of all weights
+            const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+            
+            // Get a random value between 0 and totalWeight
+            let random = Math.random() * totalWeight;
+            
+            // Find the item that corresponds to this weight
+            for (let i = 0; i < items.length; i++) {
+                random -= weights[i];
+                if (random < 0) {
+                    return items[i];
+                }
+            }
+            
+            // Fallback to last item if something goes wrong
+            return items[items.length - 1];
+        }
+        
+        // Helper function to generate generic bet levels
+        function generateGenericBetLevels(min, max) {
+            const levels = [];
+            let current = min;
+            
+            while (current <= max) {
+                levels.push(current);
+                
+                // Increase by different amounts based on current value
+                if (current < 1) {
+                    current += 0.2;
+                } else if (current < 5) {
+                    current += 1;
+                } else if (current < 20) {
+                    current += 5;
+                } else {
+                    current += 10;
+                }
+                
+                // Round to 1 decimal place
+                current = Math.round(current * 10) / 10;
+            }
+            
+            return levels;
+        }
         
         // Set up buy amount animation
         if (!document.querySelector('.buy-amount-animation-style')) {

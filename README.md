@@ -86,6 +86,37 @@ The interface is designed like a dungeon crawler with:
 
 SlotQuest is built using plain HTML, CSS, and JavaScript. The game data is loaded from the stake.json file, which contains information about various slot games including their names, providers, and image URLs.
 
+## New Slot Management Features
+
+The application now includes a slot management interface accessible at `/admin.html`. This interface allows you to:
+
+### Provider Bet Level Management
+- Define default bet levels for each game provider
+- Each provider has a set of predefined bet levels that will be used by default for its games
+- Add or remove bet levels for any provider
+- These provider defaults ensure consistent bet amounts across games from the same provider
+
+### Slot Management
+- Edit existing slots or add new ones
+- Set custom bet levels for individual slots, overriding provider defaults
+- Edit slot names, providers, and image URLs
+- Filter and search through the slot library
+- Create new slots with your own custom settings
+
+### Bet Level Integration
+- The game now uses these bet levels when determining available bet amounts
+- When playing a slot, the available bet amounts will match either the slot's custom bet levels or its provider's default levels
+- Bet levels are filtered based on the player's current balance and min/max bet settings
+- This creates a more realistic and authentic slot experience
+
+### How to Use Slot Management
+1. Access the slot management interface at `/admin.html` or click the "Slot Management" button in the footer
+2. Use the tabs to switch between Provider Settings and Slot Management
+3. When creating or editing slots, you can:
+   - Set custom bet levels that override provider defaults
+   - Return to provider defaults by removing all custom bet levels
+   - Save changes which will be stored in the stake.json file
+
 ## Disclaimer
 
 SlotQuest is designed for entertainment and tracking purposes only. It does not allow actual gambling and is meant to be used alongside your regular slot gameplay on licensed gambling sites. Always gamble responsibly and set limits for yourself.

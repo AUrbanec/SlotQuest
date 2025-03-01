@@ -779,6 +779,29 @@ footer {
     word-break: break-all;
 }
 
+/* Admin Link Styles */
+.admin-link {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.admin-link .btn {
+    background-color: #3498db;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+    display: inline-block;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+
+.admin-link .btn:hover {
+    background-color: #2980b9;
+}
+
 /* Responsive Styles */
 @media (max-width: 768px) {
     h1 {
