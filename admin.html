@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlotQuest - Slot Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ff9f1c;
+            padding-bottom: 10px;
+        }
+        
+        .admin-header h1 {
+            color: #ff9f1c;
+            margin: 0;
+        }
+        
+        .admin-back-btn {
+            background-color: #2c3e50;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .admin-back-btn:hover {
+            background-color: #34495e;
+        }
+        
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab-btn {
+            padding: 10px 20px;
+            background-color: #2c3e50;
+            color: #fff;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .tab-btn.active {
+            background-color: #ff9f1c;
+            color: #000;
+        }
+        
+        .admin-content {
+            margin-bottom: 20px;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: rgba(44, 62, 80, 0.7);
+            border-radius: 0 5px 5px 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Provider section styles */
+        .provider-list {
+            margin-bottom: 20px;
+        }
+        
+        .provider-card {
+            background-color: rgba(52, 73, 94, 0.7);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .provider-card:hover {
+            background-color: rgba(52, 73, 94, 0.9);
+        }
+        
+        .provider-card.active {
+            background-color: rgba(255, 159, 28, 0.3);
+            border-left: 5px solid #ff9f1c;
+        }
+        
+        .provider-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        
+        .provider-details {
+            display: none;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.3);
+        }
+        
+        .provider-card.active .provider-details {
+            display: block;
+        }
+        
+        .provider-bet-levels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .bet-level-tag {
+            background-color: rgba(46, 204, 113, 0.7);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background-color: #2c3e50;
+            color: #fff;
+        }
+        
+        .bet-level-input {
+            max-width: 100px;
+        }
+        
+        .action-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .add-btn {
+            background-color: #2ecc71;
+            color: #fff;
+        }
+        
+        .add-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .remove-btn {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+        
+        .remove-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .save-btn {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+        
+        .save-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        /* Slot management styles */
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #2c3e50;
+            color: #fff;
+        }
+        
+        .filter-select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #2c3e50;
+            color: #fff;
+            min-width: 150px;
+        }
+        
+        .slot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .slot-card {
+            background-color: rgba(52, 73, 94, 0.7);
+            border-radius: 5px;
+            padding: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .slot-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .slot-card.active {
+            border: 2px solid #ff9f1c;
+        }
+        
+        .slot-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .slot-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 1em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .slot-provider {
+            color: #bbb;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .slot-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        .slot-form {
+            background-color: rgba(44, 62, 80, 0.9);
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 159, 28, 0.5);
+        }
+        
+        .slot-form h3 {
+            margin-top: 0;
+            color: #ff9f1c;
+            border-bottom: 1px solid rgba(255, 159, 28, 0.5);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .bet-levels-container {
+            margin-top: 15px;
+        }
+        
+        .bet-level-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .bet-pill {
+            background-color: rgba(46, 204, 113, 0.7);
+            padding: 5px 10px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .remove-pill {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(231, 76, 60, 0.7);
+        }
+        
+        .remove-pill:hover {
+            background-color: rgba(231, 76, 60, 1);
+        }
+        
+        .bonus-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .bonus-pill {
+            background-color: rgba(155, 89, 182, 0.7);
+            padding: 5px 10px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .feature-spin-tag {
+            background-color: rgba(241, 196, 15, 0.7);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        
+        .bonus-count {
+            background-color: rgba(155, 89, 182, 0.7);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-top: 5px;
+            margin-left: 5px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .checkbox-group input {
+            width: auto;
+        }
+        
+        .status-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: rgba(46, 204, 113, 0.9);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .status-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .status-message.error {
+            background-color: rgba(231, 76, 60, 0.9);
+        }
+        
+        .create-slot-btn {
+            background-color: #2ecc71;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+            display: block;
+        }
+        
+        .create-slot-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .add-slot-container {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: rgba(44, 62, 80, 0.5);
+            border-radius: 5px;
+            border: 1px dashed rgba(46, 204, 113, 0.5);
+        }
+        
+        .help-text {
+            font-size: 0.9em;
+            color: #bbb;
+            margin: 5px 0 0 0;
+        }
+        
+        /* Scrollbar styling */
+        .slot-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .slot-grid::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        .slot-grid::-webkit-scrollbar-thumb {
+            background: rgba(255, 159, 28, 0.6);
+            border-radius: 4px;
+        }
+        
+        .slot-grid::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 159, 28, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>SlotQuest Management</h1>
+            <button class="admin-back-btn" onclick="window.location.href='index.html'">Back to Game</button>
+        </div>
+        
+        <div class="admin-tabs">
+            <button class="tab-btn active" data-tab="providers">Provider Settings</button>
+            <button class="tab-btn" data-tab="slots">Slot Management</button>
+        </div>
+        
+        <div class="admin-content">
+            <!-- Provider Settings Tab -->
+            <div id="providers-tab" class="tab-content active">
+                <div class="provider-actions">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="new-provider-name">Add New Provider:</label>
+                            <input type="text" id="new-provider-name" placeholder="Provider Name">
+                        </div>
+                        <button id="add-provider-btn" class="action-btn add-btn">Add Provider</button>
+                    </div>
+                </div>
+                
+                <div class="provider-list" id="provider-list">
+                    <!-- Provider cards will be dynamically generated here -->
+                </div>
+            </div>
+            
+            <!-- Slot Management Tab -->
+            <div id="slots-tab" class="tab-content">
+                <div class="search-bar">
+                    <input type="text" id="slot-search" class="search-input" placeholder="Search slots...">
+                    <select id="provider-filter" class="filter-select">
+                        <option value="">All Providers</option>
+                        <!-- Provider options will be populated here -->
+                    </select>
+                </div>
+                
+                <div class="add-slot-container">
+                    <button id="create-slot-btn" class="create-slot-btn">Create New Slot</button>
+                    <p class="help-text">Create a new slot with all features including bet levels, feature spins, and bonuses.</p>
+                </div>
+                
+                <div class="slot-grid" id="slot-grid">
+                    <!-- Slot cards will be dynamically generated here -->
+                </div>
+                
+                <div class="slot-form" id="slot-form" style="display: none;">
+                    <h3 id="slot-form-title">Edit Slot</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="slot-name-input">Slot Name:</label>
+                            <input type="text" id="slot-name-input" placeholder="Slot Name">
+                        </div>
+                        <div class="form-group">
+                            <label for="slot-provider-input">Provider:</label>
+                            <select id="slot-provider-input">
+                                <!-- Provider options will be populated here -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="slot-image-url-input">Image URL:</label>
+                            <input type="text" id="slot-image-url-input" placeholder="https://example.com/image.jpg">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="feature-spins-input">Feature Spins:</label>
+                            <select id="feature-spins-input">
+                                <option value="true">Yes</option>
+                                <option value="false" selected>No</option>
+                            </select>
+                            <p class="help-text">Does this game have feature spins available?</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="feature-spins-multiplier-input">Feature Spins Multiplier:</label>
+                            <input type="number" id="feature-spins-multiplier-input" placeholder="Multiplier" min="1" step="1" value="1">
+                            <p class="help-text">Base bet x multiplier = feature spins cost</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bet-levels-container">
+                        <label>Bet Levels:</label>
+                        <p class="bet-source-info" id="bet-source-info">Using default bet levels from provider.</p>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="number" id="new-bet-level" class="bet-level-input" placeholder="Amount" min="0.1" step="0.1">
+                            </div>
+                            <button id="add-bet-level-btn" class="action-btn add-btn">Add Bet Level</button>
+                        </div>
+                        
+                        <div class="bet-level-pills" id="bet-level-pills">
+                            <!-- Bet level pills will be dynamically generated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="bonuses-container">
+                        <label>Bonuses:</label>
+                        <p class="help-text">Add bonuses available in this game with their corresponding multipliers.</p>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="text" id="new-bonus-name" placeholder="Bonus Name">
+                                <p class="help-text">E.g., "Super Free Spins"</p>
+                            </div>
+                            <div class="form-group">
+                                <input type="number" id="new-bonus-multiplier" placeholder="Multiplier" min="1" step="1">
+                                <p class="help-text">Base bet x multiplier = bonus cost</p>
+                            </div>
+                            <button id="add-bonus-btn" class="action-btn add-btn">Add Bonus</button>
+                        </div>
+                        
+                        <div class="bonus-pills" id="bonus-pills">
+                            <!-- Bonus pills will be dynamically generated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button id="save-slot-btn" class="action-btn save-btn">Save Slot</button>
+                        <button id="cancel-slot-btn" class="action-btn remove-btn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="status-message" class="status-message"></div>
+    
+    <script src="admin.js"></script>
+</body>
+</html>
