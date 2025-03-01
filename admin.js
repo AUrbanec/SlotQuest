@@ -16,12 +16,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const slotImageUrlInput = document.getElementById('slot-image-url-input');
     const featureSpinsInput = document.getElementById('feature-spins-input');
     const featureSpinsMultiplierInput = document.getElementById('feature-spins-multiplier-input');
+    const featureSpinsOptions = document.getElementById('feature-spins-options');
+    const newFeatureSpinName = document.getElementById('new-feature-spin-name');
+    const newFeatureSpinMultiplier = document.getElementById('new-feature-spin-multiplier');
+    const newFeatureSpinDescription = document.getElementById('new-feature-spin-description');
+    const addFeatureSpinBtn = document.getElementById('add-feature-spin-btn');
+    const featureSpinPills = document.getElementById('feature-spin-pills');
     const betSourceInfo = document.getElementById('bet-source-info');
     const newBetLevelInput = document.getElementById('new-bet-level');
     const addBetLevelBtn = document.getElementById('add-bet-level-btn');
     const betLevelPills = document.getElementById('bet-level-pills');
     const newBonusName = document.getElementById('new-bonus-name');
     const newBonusMultiplier = document.getElementById('new-bonus-multiplier');
+    const newBonusDescription = document.getElementById('new-bonus-description');
     const addBonusBtn = document.getElementById('add-bonus-btn');
     const bonusPills = document.getElementById('bonus-pills');
     const saveSlotBtn = document.getElementById('save-slot-btn');
@@ -69,6 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
         createSlotBtn.addEventListener('click', createNewSlot);
         addBetLevelBtn.addEventListener('click', addBetLevel);
         addBonusBtn.addEventListener('click', addBonus);
+        addFeatureSpinBtn.addEventListener('click', addFeatureSpin);
         saveSlotBtn.addEventListener('click', saveSlot);
         cancelSlotBtn.addEventListener('click', cancelSlotEdit);
         slotProviderInput.addEventListener('change', function() {
@@ -112,6 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         bet_levels: slot.bet_levels || [],
                         feature_spins: slot.feature_spins !== undefined ? slot.feature_spins : false,
                         feature_spins_multiplier: slot.feature_spins_multiplier || 1,
+                        additional_feature_spins: slot.additional_feature_spins || [],
                         bonuses: slot.bonuses || []
                     };
                 });
@@ -520,6 +529,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Populate bet levels
         updateBetLevelPills(slot);
         
+        // Populate feature spins
+        updateFeatureSpinPills(slot);
+        
         // Populate bonuses
         updateBonusPills(slot);
         
@@ -556,6 +568,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Reset bet levels
         updateBetLevelPills();
         
+        // Reset feature spins
+        updateFeatureSpinPills();
+        
         // Reset bonuses
         updateBonusPills();
         
@@ -565,11 +580,110 @@ document.addEventListener('DOMContentLoaded', function() {
         // Scroll to the form
         slotForm.scrollIntoView({ behavior: 'smooth' });
     }
+    
+    function addFeatureSpin() {
+        const name = newFeatureSpinName.value.trim();
+        const multiplier = parseInt(newFeatureSpinMultiplier.value);
+        const description = newFeatureSpinDescription.value.trim();
+        
+        if (!name) {
+            showStatusMessage('Feature spin name cannot be empty', true);
+            return;
+        }
+        
+        if (isNaN(multiplier) || multiplier < 1) {
+            showStatusMessage('Please enter a valid multiplier', true);
+            return;
+        }
+        
+        // Get current feature spins
+        let currentFeatureSpins = [];
+        
+        if (!appData.isCreatingNewSlot && appData.selectedSlotId !== null) {
+            // Editing existing slot
+            const slot = appData.slots.find(s => s.id === appData.selectedSlotId);
+            if (slot) {
+                currentFeatureSpins = slot.additional_feature_spins || [];
+            }
+        }
+        
+        // Check if feature spin with same name already exists
+        if (currentFeatureSpins.some(spin => spin.name === name)) {
+            showStatusMessage('A feature spin with this name already exists', true);
+            return;
+        }
+        
+        // Add the new feature spin
+        currentFeatureSpins.push({
+            name: name,
+            multiplier: multiplier,
+            description: description
+        });
+        
+        // Update the slot object if editing
+        if (!appData.isCreatingNewSlot && appData.selectedSlotId !== null) {
+            const slot = appData.slots.find(s => s.id === appData.selectedSlotId);
+            if (slot) {
+                slot.additional_feature_spins = currentFeatureSpins;
+            }
+        }
+        
+        // Clear inputs
+        newFeatureSpinName.value = '';
+        newFeatureSpinMultiplier.value = '';
+        newFeatureSpinDescription.value = '';
+        
+        // Update UI
+        if (!appData.isCreatingNewSlot && appData.selectedSlotId !== null) {
+            const slot = appData.slots.find(s => s.id === appData.selectedSlotId);
+            updateFeatureSpinPills(slot);
+        } else {
+            // Creating a new slot, manually set the feature spins
+            updateFeatureSpinPills({ additional_feature_spins: currentFeatureSpins });
+        }
+        
+        showStatusMessage(`Added feature spin: ${name} (${multiplier}x)`);
+    }
+    
+    function removeFeatureSpin(name) {
+        // Get current feature spins
+        let currentFeatureSpins = [];
+        let slot = null;
+        
+        if (!appData.isCreatingNewSlot && appData.selectedSlotId !== null) {
+            // Editing existing slot
+            slot = appData.slots.find(s => s.id === appData.selectedSlotId);
+            if (slot) {
+                currentFeatureSpins = slot.additional_feature_spins || [];
+            }
+        }
+        
+        // Find and remove the feature spin
+        const index = currentFeatureSpins.findIndex(spin => spin.name === name);
+        if (index !== -1) {
+            currentFeatureSpins.splice(index, 1);
+            
+            // Update the slot object if editing
+            if (slot) {
+                slot.additional_feature_spins = currentFeatureSpins;
+            }
+            
+            // Update UI
+            if (!appData.isCreatingNewSlot && slot) {
+                updateFeatureSpinPills(slot);
+            } else {
+                updateFeatureSpinPills({ additional_feature_spins: currentFeatureSpins });
+            }
+            
+            showStatusMessage(`Removed feature spin: ${name}`);
+        }
+    }
 
     function updateFeatureSpinsVisibility() {
-        // Show/hide feature spins multiplier based on whether feature spins is enabled
+        // Show/hide feature spins multiplier and options based on whether feature spins is enabled
         const hasFeatureSpins = featureSpinsInput.value === 'true';
         featureSpinsMultiplierInput.parentElement.style.display = hasFeatureSpins ? 'block' : 'none';
+        featureSpinsOptions.style.display = hasFeatureSpins ? 'block' : 'none';
     }
     
     function updateFeatureSpinsFromProvider(providerName) {
@@ -630,6 +744,56 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function updateFeatureSpinPills(slot = null) {
+        featureSpinPills.innerHTML = '';
+        
+        let featureSpins = [];
+        
+        // If we have a slot with additional feature spins
+        if (slot && slot.additional_feature_spins && slot.additional_feature_spins.length > 0) {
+            featureSpins = slot.additional_feature_spins;
+        }
+        
+        // Create pills for each feature spin
+        featureSpins.forEach(spin => {
+            const pill = document.createElement('div');
+            pill.className = 'feature-spin-pill';
+            
+            const header = document.createElement('div');
+            header.className = 'feature-spin-pill-header';
+            
+            const name = document.createElement('div');
+            name.className = 'feature-spin-pill-name';
+            name.textContent = spin.name;
+            
+            const multiplier = document.createElement('div');
+            multiplier.className = 'feature-spin-pill-multiplier';
+            multiplier.textContent = `${spin.multiplier}x`;
+            
+            const description = document.createElement('div');
+            description.className = 'feature-spin-pill-description';
+            description.textContent = spin.description || '';
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-pill';
+            removeBtn.textContent = '×';
+            removeBtn.dataset.name = spin.name;
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeFeatureSpin(e.target.dataset.name);
+            });
+            
+            header.appendChild(name);
+            header.appendChild(multiplier);
+            header.appendChild(removeBtn);
+            
+            pill.appendChild(header);
+            pill.appendChild(description);
+            
+            featureSpinPills.appendChild(pill);
+        });
+    }
+    
     function updateBonusPills(slot = null) {
         bonusPills.innerHTML = '';
         
@@ -644,16 +808,54 @@ document.addEventListener('DOMContentLoaded', function() {
         bonuses.forEach(bonus => {
             const pill = document.createElement('div');
             pill.className = 'bonus-pill';
-            pill.innerHTML = `
-                ${bonus.name} (${bonus.multiplier}x)
-                <button class="remove-pill" data-name="${bonus.name}">×</button>
-            `;
             
-            // Add event listener to remove button
-            pill.querySelector('.remove-pill').addEventListener('click', (e) => {
-                e.stopPropagation();
-                removeBonus(e.target.dataset.name);
-            });
+            // Enhanced pill format with description if available
+            if (bonus.description) {
+                pill.className = 'feature-spin-pill'; // Reuse the same pill style
+                
+                const header = document.createElement('div');
+                header.className = 'feature-spin-pill-header';
+                
+                const name = document.createElement('div');
+                name.className = 'feature-spin-pill-name';
+                name.textContent = bonus.name;
+                
+                const multiplier = document.createElement('div');
+                multiplier.className = 'feature-spin-pill-multiplier';
+                multiplier.textContent = `${bonus.multiplier}x`;
+                
+                const description = document.createElement('div');
+                description.className = 'feature-spin-pill-description';
+                description.textContent = bonus.description;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-pill';
+                removeBtn.textContent = '×';
+                removeBtn.dataset.name = bonus.name;
+                removeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeBonus(e.target.dataset.name);
+                });
+                
+                header.appendChild(name);
+                header.appendChild(multiplier);
+                header.appendChild(removeBtn);
+                
+                pill.appendChild(header);
+                pill.appendChild(description);
+            } else {
+                // Simple format for bonuses without description
+                pill.innerHTML = `
+                    ${bonus.name} (${bonus.multiplier}x)
+                    <button class="remove-pill" data-name="${bonus.name}">×</button>
+                `;
+                
+                // Add event listener to remove button
+                pill.querySelector('.remove-pill').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeBonus(e.target.dataset.name);
+                });
+            }
             
             bonusPills.appendChild(pill);
         });
@@ -900,9 +1102,55 @@ document.addEventListener('DOMContentLoaded', function() {
             betLevels.push(parseFloat(pill.dataset.value));
         });
         
+        // Get feature spins from the UI
+        const additionalFeatureSpins = [];
+        document.querySelectorAll('.feature-spin-pill').forEach(pill => {
+            // Skip if this is a bonus pill
+            if (pill.parentElement.id !== 'feature-spin-pills') return;
+            
+            const nameElement = pill.querySelector('.feature-spin-pill-name');
+            const multiplierElement = pill.querySelector('.feature-spin-pill-multiplier');
+            const descriptionElement = pill.querySelector('.feature-spin-pill-description');
+            
+            if (nameElement && multiplierElement) {
+                const name = nameElement.textContent;
+                const multiplierMatch = multiplierElement.textContent.match(/(\d+)x/);
+                const multiplier = multiplierMatch ? parseInt(multiplierMatch[1]) : 1;
+                const description = descriptionElement ? descriptionElement.textContent : '';
+                
+                additionalFeatureSpins.push({
+                    name: name,
+                    multiplier: multiplier,
+                    description: description
+                });
+            }
+        });
+        
         // Get bonuses from the UI
         const bonuses = [];
-        document.querySelectorAll('.bonus-pill .remove-pill').forEach(pill => {
+        
+        // First get enhanced bonuses
+        document.querySelectorAll('.bonus-pills .feature-spin-pill').forEach(pill => {
+            const nameElement = pill.querySelector('.feature-spin-pill-name');
+            const multiplierElement = pill.querySelector('.feature-spin-pill-multiplier');
+            const descriptionElement = pill.querySelector('.feature-spin-pill-description');
+            
+            if (nameElement && multiplierElement) {
+                const name = nameElement.textContent;
+                const multiplierMatch = multiplierElement.textContent.match(/(\d+)x/);
+                const multiplier = multiplierMatch ? parseInt(multiplierMatch[1]) : 1;
+                const description = descriptionElement ? descriptionElement.textContent : '';
+                
+                bonuses.push({
+                    name: name,
+                    multiplier: multiplier,
+                    description: description
+                });
+            }
+        });
+        
+        // Then get simple bonuses
+        document.querySelectorAll('.bonus-pills .bonus-pill .remove-pill').forEach(pill => {
             const bonusName = pill.dataset.name;
             const bonusText = pill.parentElement.textContent.trim();
             const multiplierMatch = bonusText.match(/\((\d+)x\)/);
@@ -925,6 +1173,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 bet_levels: betLevels,
                 feature_spins: hasFeatureSpins,
                 feature_spins_multiplier: featureSpinsMultiplier,
+                additional_feature_spins: additionalFeatureSpins,
                 bonuses: bonuses
             });
             
@@ -939,6 +1188,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 slot.bet_levels = betLevels;
                 slot.feature_spins = hasFeatureSpins;
                 slot.feature_spins_multiplier = featureSpinsMultiplier;
+                slot.additional_feature_spins = additionalFeatureSpins;
                 slot.bonuses = bonuses;
                 
                 showStatusMessage(`Updated slot: ${name}`);

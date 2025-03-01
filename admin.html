@@ -374,6 +374,91 @@
             margin-top: 5px;
             margin-left: 5px;
         }
+        
+        .section-header {
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 159, 28, 0.3);
+            padding-bottom: 8px;
+        }
+        
+        .section-header h4 {
+            color: #ff9f1c;
+            margin: 0 0 5px 0;
+        }
+        
+        .feature-spins-container, 
+        .bonuses-container, 
+        .bet-levels-container {
+            background-color: rgba(52, 73, 94, 0.4);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(52, 73, 94, 0.8);
+        }
+        
+        .feature-spins-options {
+            padding: 15px;
+            border-radius: 5px;
+            background-color: rgba(44, 62, 80, 0.4);
+            margin-top: 15px;
+        }
+        
+        .form-group.full-width {
+            flex: 1 0 100%;
+        }
+        
+        .form-group textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background-color: #2c3e50;
+            color: #fff;
+            resize: vertical;
+        }
+        
+        .feature-spin-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .feature-spin-pill {
+            background-color: rgba(241, 196, 15, 0.7);
+            padding: 10px 15px;
+            border-radius: 5px;
+            position: relative;
+            width: 100%;
+        }
+        
+        .feature-spin-pill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .feature-spin-pill-name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .feature-spin-pill-multiplier {
+            background-color: rgba(241, 196, 15, 0.9);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+        
+        .feature-spin-pill-description {
+            font-size: 0.9em;
+            color: #eee;
+            border-top: 1px dashed rgba(255, 255, 255, 0.2);
+            padding-top: 8px;
+            margin-top: 8px;
+        }
 
         .checkbox-group {
             display: flex;
@@ -530,19 +615,56 @@
                         </div>
                     </div>
                     
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="feature-spins-input">Feature Spins:</label>
-                            <select id="feature-spins-input">
-                                <option value="true">Yes</option>
-                                <option value="false" selected>No</option>
-                            </select>
-                            <p class="help-text">Does this game have feature spins available?</p>
+                    <div class="feature-spins-container">
+                        <div class="section-header">
+                            <h4>Feature Spins</h4>
+                            <p class="help-text">Configure feature spin options for this game</p>
                         </div>
-                        <div class="form-group">
-                            <label for="feature-spins-multiplier-input">Feature Spins Multiplier:</label>
-                            <input type="number" id="feature-spins-multiplier-input" placeholder="Multiplier" min="1" step="1" value="1">
-                            <p class="help-text">Base bet x multiplier = feature spins cost</p>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="feature-spins-input">Has Feature Spins:</label>
+                                <select id="feature-spins-input">
+                                    <option value="true">Yes</option>
+                                    <option value="false" selected>No</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="feature-spins-multiplier-input">Default Multiplier:</label>
+                                <input type="number" id="feature-spins-multiplier-input" placeholder="Multiplier" min="1" step="1" value="1">
+                                <p class="help-text">Base bet x multiplier = feature spins cost</p>
+                            </div>
+                        </div>
+                        
+                        <div id="feature-spins-options" class="feature-spins-options" style="display: none;">
+                            <div class="section-header">
+                                <h4>Additional Feature Spin Options</h4>
+                                <p class="help-text">Add multiple types of feature spins with descriptions</p>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="new-feature-spin-name">Feature Spin Name:</label>
+                                    <input type="text" id="new-feature-spin-name" placeholder="e.g., Super Free Spins">
+                                </div>
+                                <div class="form-group">
+                                    <label for="new-feature-spin-multiplier">Multiplier:</label>
+                                    <input type="number" id="new-feature-spin-multiplier" placeholder="Multiplier" min="1" step="1">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label for="new-feature-spin-description">Description:</label>
+                                    <textarea id="new-feature-spin-description" placeholder="Describe what this feature spin does"></textarea>
+                                </div>
+                            </div>
+                            
+                            <button id="add-feature-spin-btn" class="action-btn add-btn">Add Feature Spin</button>
+                            
+                            <div class="feature-spin-pills" id="feature-spin-pills">
+                                <!-- Feature spin pills will be dynamically generated here -->
+                            </div>
                         </div>
                     </div>
                     
@@ -563,19 +685,32 @@
                     </div>
                     
                     <div class="bonuses-container">
-                        <label>Bonuses:</label>
-                        <p class="help-text">Add bonuses available in this game with their corresponding multipliers.</p>
+                        <div class="section-header">
+                            <h4>Bonuses</h4>
+                            <p class="help-text">Add bonuses available in this game with their corresponding multipliers</p>
+                        </div>
+                        
                         <div class="form-row">
                             <div class="form-group">
+                                <label for="new-bonus-name">Bonus Name:</label>
                                 <input type="text" id="new-bonus-name" placeholder="Bonus Name">
                                 <p class="help-text">E.g., "Super Free Spins"</p>
                             </div>
                             <div class="form-group">
+                                <label for="new-bonus-multiplier">Multiplier:</label>
                                 <input type="number" id="new-bonus-multiplier" placeholder="Multiplier" min="1" step="1">
                                 <p class="help-text">Base bet x multiplier = bonus cost</p>
                             </div>
-                            <button id="add-bonus-btn" class="action-btn add-btn">Add Bonus</button>
                         </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label for="new-bonus-description">Description:</label>
+                                <textarea id="new-bonus-description" placeholder="Describe what this bonus does"></textarea>
+                            </div>
+                        </div>
+                        
+                        <button id="add-bonus-btn" class="action-btn add-btn">Add Bonus</button>
                         
                         <div class="bonus-pills" id="bonus-pills">
                             <!-- Bonus pills will be dynamically generated here -->
